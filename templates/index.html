@@ -137,12 +137,17 @@ Drag & Drop Sketch Here
 </div>
 
 <button
+id="generateBtn"
 class="mt-6 w-full py-3 rounded-lg
 bg-gradient-to-r from-purple-600 to-blue-600 hover:opacity-90">
 
 Generate Code
 
 </button>
+
+<p id="loadingText" class="text-purple-300 mt-4 hidden">
+🤖 AI Processing Sketch...
+</p>
 
 </form>
 
@@ -278,6 +283,14 @@ color:{value:"#6b6bff"},
 links:{enable:true,color:"#444"},
 move:{enable:true,speed:1}
 }
+})
+
+document.getElementById("uploadForm").addEventListener("submit", function(){
+
+document.getElementById("loadingText").classList.remove("hidden")
+
+document.getElementById("generateBtn").innerText = "Generating..."
+
 })
 
 </script>
