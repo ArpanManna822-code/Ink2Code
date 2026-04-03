@@ -1,16 +1,287 @@
 <!DOCTYPE html>
-<html>
+
+<html lang="en">
+
 <head>
-    <title>Ink2Code</title>
+
+<meta charset="UTF-8">
+<title>Ink2Code</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
+
+<style>
+
+body{
+font-family:'Orbitron',system-ui;
+background:linear-gradient(270deg,#0a0a0a,#121212,#1a1a1a);
+background-size:600% 600%;
+animation:gradientBG 20s ease infinite;
+}
+
+@keyframes gradientBG{
+0%{background-position:0% 50%}
+50%{background-position:100% 50%}
+100%{background-position:0% 50%}
+}
+
+.neon-panel{
+position:relative;
+border-radius:12px;
+padding:2px;
+background:linear-gradient(120deg,#7b61ff,#00c3ff,#7b61ff);
+background-size:300% 300%;
+animation:neonFlow 6s linear infinite;
+}
+
+@keyframes neonFlow{
+0%{background-position:0% 50%}
+50%{background-position:100% 50%}
+100%{background-position:0% 50%}
+}
+
+.neon-inner{
+background:rgba(18,18,18,0.85);
+border-radius:10px;
+padding:24px;
+backdrop-filter:blur(12px);
+border:1px solid rgba(255,255,255,0.06);
+box-shadow:
+inset 0 0 10px rgba(0,0,0,0.5),
+0 10px 30px rgba(0,0,0,0.6);
+transition:all .3s ease;
+}
+
+.neon-panel:hover .neon-inner{
+box-shadow:
+0 0 15px rgba(123,97,255,.6),
+0 0 30px rgba(0,195,255,.4);
+transform:translateY(-2px);
+}
+
+h2{
+text-shadow:0 0 6px rgba(120,120,255,0.6);
+}
+
+</style>
+
 </head>
-<body>
 
-<h1>Upload Your UI Sketch</h1>
+<body class="text-white min-h-screen">
 
-<form action="/upload" method="post" enctype="multipart/form-data">
-    <input type="file" name="sketch">
-    <button type="submit">Upload Sketch</button>
+<!-- Unreal-style top bar -->
+
+<div class="w-full bg-black/70 backdrop-blur border-b border-gray-700 px-6 py-3 flex items-center justify-between">
+
+<div class="flex items-center gap-3">
+<div class="w-3 h-3 bg-red-500 rounded-full"></div>
+<div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
+<div class="w-3 h-3 bg-green-500 rounded-full"></div>
+</div>
+
+<div class="text-sm text-gray-400">
+Ink2Code AI Interface
+</div>
+
+<div class="text-xs text-gray-500">
+Sketch → Code Engine
+</div>
+
+</div>
+
+<div id="tsparticles"
+style="position:fixed;width:100%;height:100%;z-index:-1;"></div>
+
+<div class="max-w-7xl mx-auto p-10">
+
+<h1 class="text-5xl font-bold mb-3
+bg-gradient-to-r from-purple-400 via-blue-400 to-cyan-400
+text-transparent bg-clip-text">
+
+Ink2Code
+
+</h1>
+
+<p class="text-gray-400 mb-10">
+AI-powered Sketch → UI Code Generator
+</p>
+
+<div class="grid grid-cols-12 gap-6 items-start">
+
+<!-- Upload Panel -->
+
+<div class="neon-panel col-span-2">
+<div class="neon-inner">
+
+<h2 class="text-purple-300 mb-3 font-semibold border-b border-gray-700 pb-2">
+Upload Sketch
+</h2>
+
+<form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+
+<div id="dropzone"
+class="border-2 border-dashed border-purple-500 rounded-lg p-10 text-center cursor-pointer hover:bg-purple-900/20">
+
+Drag & Drop Sketch Here
+
+<input type="file" name="sketch" id="fileInput" class="hidden">
+
+</div>
+
+<button
+class="mt-6 w-full py-3 rounded-lg
+bg-gradient-to-r from-purple-600 to-blue-600 hover:opacity-90">
+
+Generate Code
+
+</button>
+
 </form>
 
+</div>
+</div>
+
+<!-- Preview Panel -->
+
+<div class="neon-panel col-span-3">
+<div class="neon-inner">
+
+<h2 class="text-purple-300 mb-3 font-semibold border-b border-gray-700 pb-2">
+Sketch Preview
+</h2>
+
+<img
+id="preview"
+src="{{ image }}"
+class="rounded-lg w-full h-80 object-contain bg-black"/>
+
+</div>
+</div>
+
+<!-- Code Panel -->
+
+<div class="neon-panel col-span-3">
+<div class="neon-inner">
+
+<h2 class="text-purple-300 mb-3 font-semibold border-b border-gray-700 pb-2">
+Generete HTML
+</h2>
+
+<pre class="max-h-64 overflow-auto">
+<code class="language-html break-words">
+{{ html_code }}
+</code>
+<a
+href="/download/html"
+class="mt-3 inline-flex items-center gap-2 px-4 py-2 text-xs bg-gray-900 border border-gray-600 rounded hover:bg-gray-800 transition"></a>
+Download HTML
+</a>
+</pre>
+
+<h2 class="text-purple-300 mb-3 font-semibold border-b border-gray-700 pb-2">
+React Code
+</h2>
+
+<pre class="max-h-64 overflow-auto">
+<code class="language-js break-words">
+{{ react_code }}
+</code>
+<a
+href="/download/react"
+class="mt-3 inline-flex items-center gap-2 px-4 py-2 text-xs bg-gray-900 border border-gray-600 rounded hover:bg-gray-800 transition">
+Download React
+</a>
+</pre>
+
+<h2 class="text-purple-300 mb-3 font-semibold border-b border-gray-700 pb-2">
+Flutter Code
+</h2>
+
+<pre class="max-h-64 overflow-auto">
+<code class="language-dart break-words">
+{{ flutter_code }}
+</code>
+<a
+href="/download/flutter"
+class="mt-3 inline-flex items-center gap-2 px-4 py-2 text-xs bg-gray-900 border border-gray-600 rounded hover:bg-gray-800 transition">
+Download Flutter
+</a>
+</pre>
+
+</div>
+</div>
+
+<!-- Live Preview Panel -->  
+<div class="neon-panel col-span-4">
+<div class="neon-inner">
+
+<h2 class="text-purple-300 mb-3 font-semibold border-b border-gray-700 pb-2">
+Live UI Preview
+</h2>
+
+<div class="flex items-center gap-2 mb-2">
+<div class="w-3 h-3 bg-red-500 rounded-full"></div>
+<div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
+<div class="w-3 h-3 bg-green-500 rounded-full"></div>
+</div>
+
+<iframe
+class="w-full h-[520px] bg-white rounded-lg border border-gray-400"
+srcdoc="{{ html_code }}">
+</iframe>
+
+</div>
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+hljs.highlightAll()
+
+const dropzone=document.getElementById("dropzone")
+const input=document.getElementById("fileInput")
+const preview=document.getElementById("preview")
+
+dropzone.onclick=()=>input.click()
+
+input.onchange=e=>{
+const file=e.target.files[0]
+preview.src=URL.createObjectURL(file)
+}
+
+dropzone.ondragover=e=>{
+e.preventDefault()
+dropzone.classList.add("bg-purple-900/30")
+}
+
+dropzone.ondrop=e=>{
+e.preventDefault()
+input.files=e.dataTransfer.files
+preview.src=URL.createObjectURL(e.dataTransfer.files[0])
+}
+
+tsParticles.load("tsparticles",{
+particles:{
+number:{value:40},
+color:{value:"#6b6bff"},
+links:{enable:true,color:"#444"},
+move:{enable:true,speed:1}
+}
+})
+
+</script>
+
 </body>
+
 </html>
