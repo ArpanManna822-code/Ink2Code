@@ -84,6 +84,18 @@ Ink2Code
 
 ---
 
+## Setup Instructions
+
+git clone <repo link>
+
+cd Ink2Code
+
+pip install -r requirements.txt
+
+python app.py
+
+---
+
 ##  Author
 
 Arpan Manna
