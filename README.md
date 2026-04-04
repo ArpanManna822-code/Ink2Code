@@ -98,7 +98,14 @@ python app.py
 
 ##  Author
 
+Team : SketchStack
 Arpan Manna
+A Shivamani
+A Abhiram
 
 HackFusion 2K26 Project
+
+## Point of contact:
+
+arpanmanna822@gmail.com
 
